@@ -35,6 +35,9 @@
             "migrations/.gitignore"
         ]
     },
+    "knplabs/knp-time-bundle": {
+        "version": "v1.19.0"
+    },
     "phpunit/phpunit": {
         "version": "9.5",
         "recipe": {
@@ -238,6 +241,9 @@
             "config/packages/twig.yaml",
             "templates/base.html.twig"
         ]
+    },
+    "symfony/ux-turbo": {
+        "version": "v2.3.0"
     },
     "symfony/validator": {
         "version": "6.1",

@@ -4,11 +4,10 @@ namespace App\Controller;
 
 use DateTime;
 use DateTimeZone;
-use Psr\Log\LoggerInterface;
+use Knp\Bundle\TimeBundle\DateTimeFormatter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Constraints\Date;
 
 class PlaygorundController extends AbstractController
 {
@@ -22,10 +21,11 @@ class PlaygorundController extends AbstractController
     }
 
     #[Route('/browse', name: 'app_playground_browse')]
-    public function playgroundBrowse(): Response
+    public function playgroundBrowse(DateTimeFormatter $timeFormatter): Response
     {
         return $this->render('playground/browse.html.twig', [
-            'title' => 'Browse!'
+            'title' => 'Browse!',
+            'mixes' => $this->getMixes()
         ]);
     }
 
@@ -44,4 +44,30 @@ class PlaygorundController extends AbstractController
         return $datetime
             ->format('H:i:s \o\n d/m/Y');
     }
+
+    private function getMixes(): array
+    {
+        // temporary fake "mixes" data
+        return [
+            [
+                'title' => 'PB & Jams',
+                'trackCount' => 14,
+                'genre' => 'Rock',
+                'createdAt' => new \DateTime('2021-10-02'),
+            ],
+            [
+                'title' => 'Put a Hex on your Ex',
+                'trackCount' => 8,
+                'genre' => 'Heavy Metal',
+                'createdAt' => new \DateTime('2022-04-28'),
+            ],
+            [
+                'title' => 'Spice Grills - Summer Tunes',
+                'trackCount' => 10,
+                'genre' => 'Pop',
+                'createdAt' => new \DateTime('2019-06-20'),
+            ],
+        ];
+    }
+
 }
