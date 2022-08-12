@@ -1,0 +1,16 @@
+ <div class="row mt-3 align-items-center">
+        <div class="col-10">
+             <span id="datetime">
+                    {{ time }}
+             </span>
+        </div>
+        <div class="col-2 text-end">
+            <div data-controller="datetime"
+                 data-datetime-info-url-value="/api/get-time"
+            >
+            <button class="btn btn-outline-info" data-action="datetime#update">
+                <i class="fas fa-arrows-rotate"></i>
+            </button>
+        </div>
+    </div>
+</div>

@@ -4,7 +4,6 @@
     <h1>
         {{ title|upper }}
     </h1>
-    <span>
-        {{ time }}
-    </span>
+
+    {% include 'components/datetime.html.twig' %}
 {% endblock %}
