@@ -12,6 +12,7 @@ services:
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
             'bool $isDebug': '%kernel.debug%' # Is debug mode enabled for the current environment?
+            $twigDebugCommand: '@twig.command.debug' # Indicates Symfony that we want to inject the service that correspond to this key
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name

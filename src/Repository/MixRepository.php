@@ -4,6 +4,9 @@ namespace App\Repository;
 
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\InvalidArgumentException;
+use Symfony\Bridge\Twig\Command\DebugCommand;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -14,16 +17,19 @@ class MixRepository
 {
     const DEV_EXPIRATION_SECONDS = 5;
     const PROD_EXPIRATION_SECONDS = 60;
+
     /**
      * @param CacheInterface $cache
-     * @param HttpClientInterface $httpClient
+     * @param HttpClientInterface $githubContentClient
      * @param bool $isDebug
+     * @param $twigDebugCommand
      */
     public function __construct(
         // New syntax to create attributes easier in PHP 8 (it creates and assigns the attributes)
         private CacheInterface $cache,
-        private HttpClientInterface $httpClient,
-        private bool $isDebug
+        private HttpClientInterface $githubContentClient,
+        private bool $isDebug,
+        private DebugCommand $twigDebugCommand
     ) {}
 
     /**
@@ -38,8 +44,8 @@ class MixRepository
                         self::DEV_EXPIRATION_SECONDS :
                         self::PROD_EXPIRATION_SECONDS
             );
-            $response = $this->httpClient
-                ->request('GET', 'https://raw.githubusercontent.com/SymfonyCasts/vinyl-mixes/main/mixes.json');
+            $response = $this->githubContentClient
+                ->request('GET', '/SymfonyCasts/vinyl-mixes/main/mixes.json');
             return $response->toArray();
         });
     }

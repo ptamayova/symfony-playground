@@ -5,16 +5,19 @@ namespace App\Controller;
 use App\Repository\MixRepository;
 use DateTime;
 use DateTimeZone;
-use Psr\Cache\CacheItemInterface;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class PlaygorundController extends AbstractController
+class PlaygroundController extends AbstractController
 {
+
+    public function __construct(
+        private MixRepository $mixRepository
+    )
+    {}
+
     #[Route('/playground', name: 'app_playground', methods: ['GET'])]
     public function playground(): Response
     {
@@ -28,11 +31,11 @@ class PlaygorundController extends AbstractController
      * @throws InvalidArgumentException
      */
     #[Route('/browse', name: 'app_playground_browse')]
-    public function playgroundBrowse(MixRepository $mixRepository): Response
+    public function playgroundBrowse(): Response
     {
         return $this->render('playground/browse.html.twig', [
             'title' => 'Browse!',
-            'mixes' => $mixRepository->findAll()
+            'mixes' => $this->mixRepository->findAll()
         ]);
     }
 
