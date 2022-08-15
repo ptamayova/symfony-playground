@@ -4,14 +4,12 @@ namespace App\Controller;
 
 use DateTime;
 use DateTimeZone;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class PlaygorundController extends AbstractController
@@ -26,20 +24,20 @@ class PlaygorundController extends AbstractController
     }
 
     /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws InvalidArgumentException
      */
     #[Route('/browse', name: 'app_playground_browse')]
-    public function playgroundBrowse(HttpClientInterface $httpClient): Response
+    public function playgroundBrowse(HttpClientInterface $httpClient, CacheInterface $cache): Response
     {
-        $response = $httpClient->request('GET', 'https://raw.githubusercontent.com/SymfonyCasts/vinyl-mixes/main/mixes.json');
+        $mixes = $cache->get('mixes_data', function (CacheItemInterface $cacheItem) use ($httpClient) {
+            $cacheItem->expiresAfter(5);
+            $response = $httpClient->request('GET', 'https://raw.githubusercontent.com/SymfonyCasts/vinyl-mixes/main/mixes.json');
+            return $response->toArray();
+        });
 
         return $this->render('playground/browse.html.twig', [
             'title' => 'Browse!',
-            'mixes' => $response->toArray()
+            'mixes' => $mixes
         ]);
     }
 
@@ -51,7 +49,8 @@ class PlaygorundController extends AbstractController
         ]);
     }
 
-    private function getDateTimeString() {
+    private function getDateTimeString(): string
+    {
         $datetime = new DateTime();
         $datetime->setTimezone(new DateTimeZone('Europe/Berlin'));
 
