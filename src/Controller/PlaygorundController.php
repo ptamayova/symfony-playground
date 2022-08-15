@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\MixRepository;
 use DateTime;
 use DateTimeZone;
 use Psr\Cache\CacheItemInterface;
@@ -27,21 +28,15 @@ class PlaygorundController extends AbstractController
      * @throws InvalidArgumentException
      */
     #[Route('/browse', name: 'app_playground_browse')]
-    public function playgroundBrowse(HttpClientInterface $httpClient, CacheInterface $cache): Response
+    public function playgroundBrowse(MixRepository $mixRepository): Response
     {
-        $mixes = $cache->get('mixes_data', function (CacheItemInterface $cacheItem) use ($httpClient) {
-            $cacheItem->expiresAfter(5);
-            $response = $httpClient->request('GET', 'https://raw.githubusercontent.com/SymfonyCasts/vinyl-mixes/main/mixes.json');
-            return $response->toArray();
-        });
-
         return $this->render('playground/browse.html.twig', [
             'title' => 'Browse!',
-            'mixes' => $mixes
+            'mixes' => $mixRepository->findAll()
         ]);
     }
 
-    #[Route('/api/get-time', name: 'api_get_time', methods: ['GET'],)]
+    #[Route('/api/get-time', name: 'api_get_time', methods: ['GET'])]
     public function getTime(): Response
     {
         return $this->json([
