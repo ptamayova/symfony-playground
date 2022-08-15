@@ -4,10 +4,15 @@ namespace App\Controller;
 
 use DateTime;
 use DateTimeZone;
-use Knp\Bundle\TimeBundle\DateTimeFormatter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class PlaygorundController extends AbstractController
 {
@@ -20,12 +25,21 @@ class PlaygorundController extends AbstractController
         ]);
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     #[Route('/browse', name: 'app_playground_browse')]
-    public function playgroundBrowse(DateTimeFormatter $timeFormatter): Response
+    public function playgroundBrowse(HttpClientInterface $httpClient): Response
     {
+        $response = $httpClient->request('GET', 'https://raw.githubusercontent.com/SymfonyCasts/vinyl-mixes/main/mixes.json');
+
         return $this->render('playground/browse.html.twig', [
             'title' => 'Browse!',
-            'mixes' => $this->getMixes()
+            'mixes' => $response->toArray()
         ]);
     }
 
@@ -44,30 +58,4 @@ class PlaygorundController extends AbstractController
         return $datetime
             ->format('H:i:s \o\n d/m/Y');
     }
-
-    private function getMixes(): array
-    {
-        // temporary fake "mixes" data
-        return [
-            [
-                'title' => 'PB & Jams',
-                'trackCount' => 14,
-                'genre' => 'Rock',
-                'createdAt' => new \DateTime('2021-10-02'),
-            ],
-            [
-                'title' => 'Put a Hex on your Ex',
-                'trackCount' => 8,
-                'genre' => 'Heavy Metal',
-                'createdAt' => new \DateTime('2022-04-28'),
-            ],
-            [
-                'title' => 'Spice Grills - Summer Tunes',
-                'trackCount' => 10,
-                'genre' => 'Pop',
-                'createdAt' => new \DateTime('2019-06-20'),
-            ],
-        ];
-    }
-
 }
